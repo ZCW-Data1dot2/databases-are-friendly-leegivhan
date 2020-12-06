@@ -40,7 +40,8 @@ There are two phases of the exercises for ths project.
 
 `select * from film natural join inventory;`
 
-The solutions to these are in [sakila-queries-answers.sql](doc/sakila-queries-answers.sql) (But don't look at them until you've really tried to solved them all yourself.)
+The solutions to these are in [
+](doc/sakila-queries-answers.sql) (But don't look at them until you've really tried to solved them all yourself.)
 
 ### Phase 2. Longer, Harder, More Realistic.
 
