@@ -60,25 +60,81 @@ DROP blobs;
 --
 --* 4a. List the last names of actors, as well as how many actors have that last name.
 --
+SELECT last_name, count(last_name) FROM sakila.actor
+GROUP BY last_name
+ORDER BY count(last_name) DESC;
+--
 --* 4b. List last names of actors and the number of actors who have that last name, but only for names that are shared by at least two actors
+--
+SELECT last_name, count(last_name) FROM sakila.actor
+GROUP BY last_name
+HAVING count(last_name) >= 2
+ORDER BY count(last_name) DESC;
 --
 --* 4c. Oh, no! The actor `HARPO WILLIAMS` was accidentally entered in the `actor` table as `GROUCHO WILLIAMS`, the name of Harpo's second cousin's husband's yoga teacher. Write a query to fix the record.
 --
+UPDATE sakila.actor
+SET first_name = 'HARPO'
+WHERE first_name = 'GROUCHO'
+AND last_name = 'WILLIAMS';
+--
 --* 4d. Perhaps we were too hasty in changing `GROUCHO` to `HARPO`. It turns out that `GROUCHO` was the correct name after all! In a single query, if the first name of the actor is currently `HARPO`, change it to `GROUCHO`. Otherwise, change the first name to `MUCHO GROUCHO`, as that is exactly what the actor will be with the grievous error. BE CAREFUL NOT TO CHANGE THE FIRST NAME OF EVERY ACTOR TO `MUCHO GROUCHO`, HOWEVER! (Hint: update the record using a unique identifier.)
 --
+UPDATE sakila.actor
+SET first_name = 'GROUCHO'
+WHERE first_name = 'HARPO'
+AND last_name = 'WILLIAMS';
+--
 --* 5a. You cannot locate the schema of the `address` table. Which query would you use to re-create it?
+--
+Create database address;
+
+Show databases;
 --
 --  * Hint: [https://dev.mysql.com/doc/refman/5.7/en/show-create-table.html](https://dev.mysql.com/doc/refman/5.7/en/show-create-table.html)
 --
 --* 6a. Use `JOIN` to display the first and last names, as well as the address, of each staff member. Use the tables `staff` and `address`:
 --
+SELECT first_name, last_name, address
+FROM sakila.staff st
+	JOIN sakila.address ad
+		ON st.staff_id = ad.address_id;
+--
 --* 6b. Use `JOIN` to display the total amount rung up by each staff member in August of 2005. Use tables `staff` and `payment`.
+--
+SELECT payment_id, first_name, last_name, SUM(amount)
+	FROM sakila.staff st
+		JOIN sakila.payment pay
+			ON st.staff_id = pay.payment_id
+GROUP BY payment_id, first_name, last_name;
 --
 --* 6c. List each film and the number of actors who are listed for that film. Use tables `film_actor` and `film`. Use inner join.
 --
+SELECT title, SUM(actor_id)
+FROM sakila.film f
+	INNER JOIN sakila.film_actor fa
+		ON f.film_id = fa.film_id
+GROUP BY title;
+--
 --* 6d. How many copies of the film `Hunchback Impossible` exist in the inventory system?
 --
+SELECT title, COUNT(inventory_id)
+FROM sakila.film f
+	JOIN sakila.inventory i
+		ON f.film_id = i.film_id
+WHERE title = 'Hunchback Impossible'
+GROUP BY title;
+--
 --* 6e. Using the tables `payment` and `customer` and the `JOIN` command, list the total paid by each customer. List the customers alphabetically by last name
+--
+SELECT c.first_name AS 'First Name',
+c.last_name AS 'Last Name',
+SUM(p.amount) AS 'Total Paid'
+FROM sakila.customer c
+	JOIN sakila.payment p
+		ON c.customer_id = p.customer_id
+GROUP BY c.first_name, c.last_name
+ORDER BY c.last_name;
 --
 --* 7a. The music of Queen and Kris Kristofferson have seen an unlikely resurgence. As an unintended consequence, films starting with the letters `K` and `Q` have also soared in popularity. Use subqueries to display the titles of movies starting with the letters `K` and `Q` whose language is English.
 --
