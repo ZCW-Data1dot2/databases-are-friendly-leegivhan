@@ -150,6 +150,16 @@ WHERE language_id = 1
 --
 --* 7b. Use subqueries to display all actors who appear in the film `Alone Trip`.
 --
+SELECT f.title, a.first_name, a.last_name
+FROM sakila.actor a
+	JOIN sakila.film_actor fa
+		ON fa.actor_id = a.actor_id
+	JOIN sakila.film f
+		ON f.film_id = fa.film_id
+WHERE title IN
+(SELECT title FROM sakila.film
+WHERE title = 'Alone Trip')
+--
 --* 7c. You want to run an email marketing campaign in Canada, for which you will need the names and email addresses of all Canadian customers. Use joins to retrieve this information.
 --
 --* 7d. Sales have been lagging among young families, and you wish to target all family movies for a promotion. Identify all movies categorized as famiy films.
@@ -161,7 +171,15 @@ WHERE language_id = 1
 --* 7g. Write a query to display for each store its store ID, city, and country.
 --
 --* 7h. List the top five genres in gross revenue in descending order. (**Hint**: you may need to use the following tables: category, film_category, inventory, payment, and rental.)
---
+-- starting...
+SELECT c.name, p.amount
+FROM sakila.category c
+	JOIN sakila.film_category fc
+		ON fc.category_id = c.category_id
+	JOIN sakila.inventory i
+		ON i.film_id = f.film_id
+	JOIN sakila.rental r
+		ON r.inventory_id = i.inventory_id
 --* 8a. In your new role as an executive, you would like to have an easy way of viewing the Top five genres by gross revenue. Use the solution from the problem above to create a view. If you haven't solved 7h, you can substitute another query to create a view.
 --
 --* 8b. How would you display the view that you created in 8a?
