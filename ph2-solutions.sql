@@ -162,14 +162,57 @@ WHERE title = 'Alone Trip')
 --
 --* 7c. You want to run an email marketing campaign in Canada, for which you will need the names and email addresses of all Canadian customers. Use joins to retrieve this information.
 --
+SELECT cus.first_name, cus.last_name, cus.email, cnt.country
+FROM sakila.customer cus
+	JOIN sakila.address ad
+		ON ad.address_id = cus.address_id
+	JOIN sakila.city cty
+		ON cty.city_id = ad.city_id
+	JOIN sakila.country cnt
+		ON cnt.country_id = cty.country_id
+WHERE cnt.country = 'Canada';
+--
 --* 7d. Sales have been lagging among young families, and you wish to target all family movies for a promotion. Identify all movies categorized as famiy films.
+--
+SELECT f.title as 'Family Films'
+FROM sakila.film f
+	JOIN sakila.film_category fc
+		ON fc.film_id = f.film_id
+	JOIN sakila.category c
+		ON c.category_id = fc.category_id
+WHERE c.name = 'Family';
 --
 --* 7e. Display the most frequently rented movies in descending order.
 --
+SELECT f.title, COUNT(rental_id) AS 'Times Rented'
+FROM sakila.rental r
+	JOIN sakila.inventory i
+		ON r.inventory_id = i.inventory_id
+	JOIN sakila.film f
+		ON i.film_id = f.film_id
+GROUP BY f.title
+ORDER BY `Times Rented` DESC;
+--
 --* 7f. Write a query to display how much business, in dollars, each store brought in.
 --
+SELECT i.store_id, SUM(p.amount) AS 'Income per store'
+FROM sakila.rental r
+	JOIN sakila.inventory i
+		ON r.inventory_id = i.inventory_id
+	JOIN sakila.payment p
+		ON p.rental_id = r.rental_id
+GROUP BY i.store_id
+ORDER BY `Income per store` DESC;
 --* 7g. Write a query to display for each store its store ID, city, and country.
 --
+SELECT s.store_id, ci.city, co.country
+	FROM sakila.store s
+		JOIN sakila.address a
+			ON a.address_id = s.address_id
+		JOIN sakila.city ci
+			ON ci.city_id = a.city_id
+		JOIN sakila.country co
+			ON ci.country_id = co.country_id;
 --* 7h. List the top five genres in gross revenue in descending order. (**Hint**: you may need to use the following tables: category, film_category, inventory, payment, and rental.)
 -- starting...
 SELECT c.name, p.amount
