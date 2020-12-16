@@ -215,16 +215,41 @@ SELECT s.store_id, ci.city, co.country
 			ON ci.country_id = co.country_id;
 --* 7h. List the top five genres in gross revenue in descending order. (**Hint**: you may need to use the following tables: category, film_category, inventory, payment, and rental.)
 -- starting...
-SELECT c.name, p.amount
+SELECT c.name AS 'Genre', sum(p.amount) AS 'Gross'
 FROM sakila.category c
 	JOIN sakila.film_category fc
 		ON fc.category_id = c.category_id
 	JOIN sakila.inventory i
-		ON i.film_id = f.film_id
+		ON i.film_id = fc.film_id
 	JOIN sakila.rental r
 		ON r.inventory_id = i.inventory_id
+	JOIN sakila.payment p
+		ON p.rental_id = r.rental_id
+GROUP BY c.name
+ORDER BY sum(p.amount) DESC
+LIMIT 5;
 --* 8a. In your new role as an executive, you would like to have an easy way of viewing the Top five genres by gross revenue. Use the solution from the problem above to create a view. If you haven't solved 7h, you can substitute another query to create a view.
 --
+CREATE
+    ALGORITHM = UNDEFINED
+    DEFINER = `root`@`localhost`
+    SQL SECURITY INVOKER
+VIEW `sakila`.`grossing_genres` AS
+	SELECT c.name AS 'Genre', sum(p.amount) AS 'Gross'
+FROM sakila.category c
+	JOIN sakila.film_category fc
+		ON fc.category_id = c.category_id
+	JOIN sakila.inventory i
+		ON i.film_id = fc.film_id
+	JOIN sakila.rental r
+		ON r.inventory_id = i.inventory_id
+	JOIN sakila.payment p
+		ON p.rental_id = r.rental_id
+GROUP BY c.name
+ORDER BY sum(p.amount) DESC
+LIMIT 5;
 --* 8b. How would you display the view that you created in 8a?
 --
+SELECT * FROM sakila.grossing_genres;
 --* 8c. You find that you no longer need the view `top_five_genres`. Write a query to delete it.
+DROP VIEW sakila.grossing_genres;
